@@ -13,7 +13,7 @@ const mockStore = {
 };
 module.exports.mockStore = mockStore;
 
-const ds = new UserAPI({ store: mockStore });
+const ds = new UserAPI({ Store: mockStore });
 ds.initialize({ context: { user: { id: 1, email: 'a@a.a' } } });
 
 describe('[UserAPI.findOrCreateUser]', () => {

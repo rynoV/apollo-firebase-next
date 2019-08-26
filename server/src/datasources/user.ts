@@ -1,22 +1,24 @@
 import { DataSource, DataSourceConfig } from 'apollo-datasource'
 import isEmail from 'isemail'
 import { Context } from 'apollo-server-core'
-import { Database } from '../database'
+import { Database, Store } from '../database'
 
 interface IContextProps {
   user: {
     email: string
-    id: string
+    id: number
   }
 }
 
-class UserAPI extends DataSource {
-  private store: Database.IStore
+export class UserAPI extends DataSource {
+  private tripsStore: Database.IStore<Database.ITrip>
+  private usersStore: Database.IStore<Database.IUser>
   private context: Context<IContextProps> | undefined
 
-  constructor({ store }: { store: Database.IStore }) {
+  constructor() {
     super()
-    this.store = store
+    this.tripsStore = new Store<Database.ITrip>('trips')
+    this.usersStore = new Store<Database.IUser>('users')
   }
 
   /**
@@ -43,7 +45,7 @@ class UserAPI extends DataSource {
       return null
     }
 
-    return await this.store.users.find(email)
+    return await this.usersStore.findOrCreate({ email })
   }
 
   async bookTrips({ launchIds }: { launchIds: number[] }) {
@@ -68,22 +70,20 @@ class UserAPI extends DataSource {
 
   async bookTrip({ launchId }: { launchId: number }) {
     const userId = this.context && this.context.user.id
-    const res    = await this.store.trips.find({
-      where: { userId, launchId },
-    })
-    return res && res.length ? res[0].get() : false
+    const res    = await this.tripsStore.findOrCreate({ userId, launchId })
+    return res && res.length ? res[0] : false
   }
 
   async cancelTrip({ launchId }: { launchId: number }) {
     const userId = this.context && this.context.user.id
-    return !!this.store.trips.destroy({ where: { userId, launchId } })
+    return await this.tripsStore.destroy({ userId, launchId })
   }
 
   async getLaunchIdsByUser() {
     const userId = this.context && this.context.user.id
-    const found  = await this.store.trips.find({ userId })
+    const found  = await this.tripsStore.findOrCreate({ userId })
     return found && found.length
-      ? found.map(l => l.dataValues.launchId).filter(l => !!l)
+      ? found.map(l => l.launchId).filter(l => !!l)
       : []
   }
 
@@ -92,7 +92,7 @@ class UserAPI extends DataSource {
       return false
     }
     const userId = this.context.user.id
-    const found  = await this.store.trips.find({
+    const found  = await this.tripsStore.findOrCreate({
       userId, launchId,
     })
     return !!found

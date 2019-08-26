@@ -26,15 +26,15 @@ export declare namespace Database {
   export type ReturnDoc<R> = R & IBaseDoc
 
   export interface IStore<R> {
-    findOrCreate(query: R): Promise<Array<ReturnDoc<R>> | null>
+    findOrCreate(query: Partial<R>): Promise<Array<ReturnDoc<R>> | null>
 
-    destroy(query: R): Promise<boolean>
+    destroy(query: Partial<R>): Promise<boolean>
   }
 
   export type collections = 'users' | 'trips'
 }
 
-type ReturnDocWithoutId<R> = R & Omit<Database.IBaseDoc, 'id'>
+type ReturnDocWithoutId<R> = Partial<R> & Omit<Database.IBaseDoc, 'id'>
 
 export class Store<R> implements Database.IStore<R> {
   private readonly collection: firestore.CollectionReference
@@ -63,7 +63,7 @@ export class Store<R> implements Database.IStore<R> {
    * @return a promise resolving to a boolean
    *   indicating whether the operation was a success or not.
    */
-  async destroy(query: R): Promise<boolean> {
+  async destroy(query: Partial<R>): Promise<boolean> {
     try {
       const { docs } = await this.getQuerySnapshot(query)
 
@@ -90,7 +90,7 @@ export class Store<R> implements Database.IStore<R> {
    * @return A promise resolving to an array containing the created or found
    *   document(s), or null if an error occurred.
    */
-  async findOrCreate(query: R): Promise<Database.ReturnDoc<R>[] | null> {
+  async findOrCreate(query: Partial<R>): Promise<Database.ReturnDoc<R>[] | null> {
     try {
       const { docs } = await this.getQuerySnapshot(query)
 
@@ -112,7 +112,7 @@ export class Store<R> implements Database.IStore<R> {
     }
   }
 
-  private createDocumentObject(query: R): ReturnDocWithoutId<R> {
+  private createDocumentObject(query: Partial<R>): ReturnDocWithoutId<Partial<R>> {
     const serverTimestamp                            = firestore.FieldValue.serverTimestamp()
     const queryWithTimestamps: ReturnDocWithoutId<R> = {
       ...query,
@@ -121,11 +121,14 @@ export class Store<R> implements Database.IStore<R> {
     }
 
     return Object.entries(queryWithTimestamps).reduce(
-      (newDoc: ReturnDocWithoutId<R>, queryPair: [string, unknown]) => {
+      (
+        newDoc: ReturnDocWithoutId<Partial<R>>,
+        queryPair: [string, unknown],
+      ) => {
         newDoc[queryPair[0]] = queryPair[1]
         return newDoc
       },
-      {} as ReturnDocWithoutId<R>,
+      {} as ReturnDocWithoutId<Partial<R>>,
     )
   }
 
@@ -137,11 +140,11 @@ export class Store<R> implements Database.IStore<R> {
     return {
       ...newDoc,
       id,
-    }
+    } as Database.ReturnDoc<R>
   }
 
   private getQuerySnapshot(
-    query: R,
+    query: Partial<R>,
   ): Promise<firestore.QuerySnapshot> {
     const builtFirestoreQuery: firestore.Query = Object.entries(query).reduce(
       (firestoreQuery: firestore.Query, queryPair: [string, unknown]) => {
