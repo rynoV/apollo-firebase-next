@@ -3,7 +3,7 @@ import 'firebase/firestore'
 import { ApolloServer } from 'apollo-server'
 
 import typeDefs from './schema.graphql'
-import { Store } from './database'
+import { Database, Store } from './database'
 
 if (!firebase.apps.length) {
   const firebaseConfig = {
@@ -33,12 +33,13 @@ export const server = new ApolloServer({
 
 export async function apiHandler(req, res) {
   try {
-    let userId   = 1
+    let userId   = 2
     let launchId = 2
 
-    const trips = await new Store('trips').findOrCreate({ userId, launchId })
+    const trips = await new Store<Database.ITrip>('trips').findOrCreate({ userId, launchId })
 
     console.log('TRIPS', trips)
+    console.log(firestore.doc('trips/' + trips))
     const profiles    = await firestore.doc('profiles/dDP56JYxoP2DWxl0csbF')
       .get()
     const profileData = profiles.data()

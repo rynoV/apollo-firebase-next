@@ -4,9 +4,9 @@ import { firestore } from 'firebase'
 
 export declare namespace Database {
   export interface IBaseDoc {
-    id: number
-    createdAt: string
-    updatedAt: string
+    id: string
+    createdAt: firestore.FieldValue
+    updatedAt: firestore.FieldValue
   }
 
   export interface ITrip extends IBaseDoc {
@@ -23,8 +23,10 @@ export declare namespace Database {
     [key: string]: unknown
   }
 
-  export interface IStore<R extends IBaseDoc> {
-    findOrCreate(query: R): Promise<R[] | null>
+  export type ReturnDoc<R> = R & IBaseDoc
+
+  export interface IStore<R> {
+    findOrCreate(query: R): Promise<Array<ReturnDoc<R>> | null>
 
     destroy(query: R): Promise<boolean>
   }
@@ -32,7 +34,9 @@ export declare namespace Database {
   export type collections = 'users' | 'trips'
 }
 
-export class Store<R extends Database.IBaseDoc> implements Database.IStore<R> {
+type ReturnDocWithoutId<R> = R & Omit<Database.IBaseDoc, 'id'>
+
+export class Store<R> implements Database.IStore<R> {
   private readonly collection: firestore.CollectionReference
 
   constructor(collectionId: Database.collections) {
@@ -86,22 +90,20 @@ export class Store<R extends Database.IBaseDoc> implements Database.IStore<R> {
    * @return A promise resolving to an array containing the created or found
    *   document(s), or null if an error occurred.
    */
-  async findOrCreate(query: R): Promise<R[] | null> {
+  async findOrCreate(query: R): Promise<Database.ReturnDoc<R>[] | null> {
     try {
       const { docs } = await this.getQuerySnapshot(query)
 
       if (docs[0]) {
         return docs.map((doc: firestore.QueryDocumentSnapshot) => {
-          return doc.data() as R
+          return doc.data() as Database.ReturnDoc<R>
         })
       } else {
-        const newDocRef      = await this.collection.add(
+        const newDocRef = await this.collection.add(
           this.createDocumentObject(query),
         )
-        const newDocSnapshot = await newDocRef.get()
-        const newDoc         = ((await newDocSnapshot.data()) as unknown) as R
 
-        return [newDoc]
+        return [await this.getDocDataWithId(newDocRef)]
       }
     } catch (e) {
       console.log(e)
@@ -110,14 +112,32 @@ export class Store<R extends Database.IBaseDoc> implements Database.IStore<R> {
     }
   }
 
-  private createDocumentObject(query: R): R {
-    return Object.entries(query).reduce(
-      (newDoc: firestore.DocumentData, queryPair: [string, unknown]) => {
+  private createDocumentObject(query: R): ReturnDocWithoutId<R> {
+    const serverTimestamp                            = firestore.FieldValue.serverTimestamp()
+    const queryWithTimestamps: ReturnDocWithoutId<R> = {
+      ...query,
+      createdAt: serverTimestamp,
+      updatedAt: serverTimestamp,
+    }
+
+    return Object.entries(queryWithTimestamps).reduce(
+      (newDoc: ReturnDocWithoutId<R>, queryPair: [string, unknown]) => {
         newDoc[queryPair[0]] = queryPair[1]
         return newDoc
       },
-      {},
-    ) as R
+      {} as ReturnDocWithoutId<R>,
+    )
+  }
+
+  private async getDocDataWithId(docRef: firestore.DocumentReference): Promise<Database.ReturnDoc<R>> {
+    const { id }         = docRef
+    const newDocSnapshot = await docRef.get()
+    const newDoc         = ((await newDocSnapshot.data()) as unknown) as ReturnDocWithoutId<R>
+
+    return {
+      ...newDoc,
+      id,
+    }
   }
 
   private getQuerySnapshot(
