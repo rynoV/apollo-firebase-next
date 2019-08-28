@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@apollo/react-hooks": "3.0.0",
+    "@apollo/react-ssr": "^3.0.1",
     "@reach/router": "^1.2.1",
     "@zeit/next-typescript": "^1.1.1",
     "apollo-boost": "^0.4.4",
@@ -43,7 +44,8 @@
     "apollo-link": "^1.2.3",
     "jest": "^23.6.0",
     "nock": "^10.0.2",
-    "node-fetch": "^2.2.1"
+    "node-fetch": "^2.2.1",
+    "typescript": "^3.5.3"
   },
   "private": true
 }

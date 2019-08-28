@@ -38,10 +38,10 @@ export async function apiHandler(req, res) {
     // })
     //
     // console.log('USER', user)
-    const profiles    = await firestore.doc('profiles/dDP56JYxoP2DWxl0csbF')
-      .get()
-    const profileData = profiles.data()
-    res.status(200).json({ profile: profileData })
+    // const profiles    = await firestore.doc('profiles/dDP56JYxoP2DWxl0csbF')
+    //   .get()
+    // const profileData = profiles.data()
+    res.status(200).json({ profile: { address: 'test' } })
   } catch (e) {
     console.log('SERVER ERROR:', e)
     res.status(500)

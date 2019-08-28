@@ -1,6 +1,8 @@
 import React from 'react'
 import fetch from 'isomorphic-unfetch'
 import { NextComponentType, NextPageContext } from 'next'
+import withData from '../lib/withData'
+import Launches from './launches'
 
 interface IProps {
   profile: {
@@ -12,18 +14,13 @@ interface IProps {
   }
 }
 
-export const Home: NextComponentType<NextPageContext, any, IProps> = function({
+const Home: NextComponentType<NextPageContext, any, IProps> = function({
   profile,
+  ...rest
 }) {
   if (profile) {
     return (
-      <ul>
-        <li>{profile.address}</li>
-        <li>{profile.name}</li>
-        <li>{profile.avatar}</li>
-        <li>{profile.email}</li>
-        <li>{profile.id}</li>
-      </ul>
+      <Launches />
     )
   } else {
     return null
@@ -50,3 +47,5 @@ Home.getInitialProps = async function({ req }: NextPageContext) {
     return {}
   }
 }
+
+export const HomePage = withData(Home)

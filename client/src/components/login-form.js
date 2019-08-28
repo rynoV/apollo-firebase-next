@@ -3,10 +3,10 @@ import styled, { css } from 'react-emotion';
 import { size } from 'polished';
 
 import Button from './button';
-import space from '../assets/images/space.jpg';
-import { ReactComponent as Logo } from '../assets/logo.svg';
-import { ReactComponent as Curve } from '../assets/curve.svg';
-import { ReactComponent as Rocket } from '../assets/rocket.svg';
+import space from '../../../static/images/space.jpg';
+import { ReactComponent as Logo } from '../../../static/logo.svg';
+import { ReactComponent as Curve } from '../../../static/curve.svg';
+import { ReactComponent as Rocket } from '../../../static/rocket.svg';
 import { colors, unit } from '../styles';
 
 export default class LoginForm extends Component {

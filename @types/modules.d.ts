@@ -6,3 +6,5 @@ declare module '*.graphql' {
 
   export default defaultDocument
 }
+
+declare module 'next-apollo'

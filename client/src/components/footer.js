@@ -3,9 +3,9 @@ import styled from 'react-emotion';
 
 import MenuItem from './menu-item';
 import LogoutButton from '../containers/logout-button';
-import { ReactComponent as HomeIcon } from '../assets/icons/home.svg';
-import { ReactComponent as CartIcon } from '../assets/icons/cart.svg';
-import { ReactComponent as ProfileIcon } from '../assets/icons/profile.svg';
+import { ReactComponent as HomeIcon } from '../../../static/icons/home.svg';
+import { ReactComponent as CartIcon } from '../../../static/icons/cart.svg';
+import { ReactComponent as ProfileIcon } from '../../../static/icons/profile.svg';
 import { colors, unit } from '../styles';
 
 export default function Footer() {

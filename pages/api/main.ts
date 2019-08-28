@@ -1,3 +1,3 @@
-import { apiHandler } from 'server/src/main'
+import { apiHandler } from '../../server/src/main'
 
 export default apiHandler

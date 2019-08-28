@@ -1,3 +1,3 @@
-import { Home } from '../client/src/pages/Home'
+import { HomePage } from '../client/src/pages/Home'
 
-export default Home
+export default HomePage

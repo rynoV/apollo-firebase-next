@@ -48,7 +48,7 @@ export const resolvers: IResolvers = {
       { launchIds }: { launchIds: string[] },
       { dataSources },
     ) => {
-      const results = await dataSources.userAPI.bookTrips({ launchIds })
+      const results  = await dataSources.userAPI.bookTrips({ launchIds })
       const launches = await dataSources.launchAPI.getLaunchesByIds({
         launchIds,
       })
