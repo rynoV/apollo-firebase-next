@@ -4,12 +4,12 @@ import { NextComponentType, NextPageContext } from 'next'
 
 interface IProps {
   profile: {
-    address: string;
-    name: string;
-    avatar: string;
-    email: string;
-    id: string;
-  };
+    address: string
+    name: string
+    avatar: string
+    email: string
+    id: string
+  }
 }
 
 export const Home: NextComponentType<NextPageContext, any, IProps> = function({

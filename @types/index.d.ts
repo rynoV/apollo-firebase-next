@@ -1,9 +1,32 @@
-declare module '*.graphql' {
-  import { DocumentNode } from 'graphql'
-  const MyQuery: DocumentNode
+export interface ILaunchConnection {
+  cursor: string
+  hasMore: boolean
+  launches: ILaunch[]
+}
 
-  export { MyQuery }
+export interface ILaunch {
+  id: string
+  site?: string
+  mission?: IMission
+  rocket?: IRocket
+  isBooked?: boolean
+}
 
-  export default defaultDocument
+interface IRocket {
+  id: string
+  name?: string
+  type?: string
+}
+
+interface IUser {
+  id: string
+  email: string
+  trips: [Launch]
+}
+
+interface IMission {
+  name?: string
+
+  missionPatch?(size: PatchSize): string
 }
 

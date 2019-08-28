@@ -95,9 +95,9 @@ export class Store<R> implements Database.IStore<R> {
       const { docs } = await this.getQuerySnapshot(query)
 
       if (docs[0]) {
-        return docs.map((doc: firestore.QueryDocumentSnapshot) => {
-          return doc.data() as Database.ReturnDoc<R>
-        })
+        return await Promise.all(docs.map(async (doc: firestore.QueryDocumentSnapshot) => {
+          return await this.getDocDataWithId(doc.ref) as Database.ReturnDoc<R>
+        }))
       } else {
         const newDocRef = await this.collection.add(
           this.createDocumentObject(query),

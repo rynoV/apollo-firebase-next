@@ -4,9 +4,9 @@ import { Context } from 'apollo-server-core'
 import { Database, Store } from '../database'
 
 interface IContextProps {
-  user: {
-    email: string
-    id: number
+  user?: {
+    email?: string
+    id?: number
   }
 }
 
@@ -27,8 +27,8 @@ export class UserAPI extends DataSource {
    * like caches and context. We'll assign this.context to the request context
    * here, so we can know about the user making requests
    */
-  initialize(config: DataSourceConfig<Context<IContextProps>>) {
-    this.context = config.context
+  initialize(config: DataSourceConfig<{}>) {
+    this.context = config.context as Context<IContextProps>
   }
 
   /**
@@ -49,7 +49,7 @@ export class UserAPI extends DataSource {
   }
 
   async bookTrips({ launchIds }: { launchIds: number[] }) {
-    const userId = this.context && this.context.user.id
+    const userId = this.context && this.context.user && this.context.user.id
     if (!userId) {
       return
     }
@@ -69,18 +69,18 @@ export class UserAPI extends DataSource {
   }
 
   async bookTrip({ launchId }: { launchId: number }) {
-    const userId = this.context && this.context.user.id
+    const userId = this.context && this.context.user && this.context.user.id
     const res    = await this.tripsStore.findOrCreate({ userId, launchId })
     return res && res.length ? res[0] : false
   }
 
   async cancelTrip({ launchId }: { launchId: number }) {
-    const userId = this.context && this.context.user.id
+    const userId = this.context && this.context.user && this.context.user.id
     return await this.tripsStore.destroy({ userId, launchId })
   }
 
   async getLaunchIdsByUser() {
-    const userId = this.context && this.context.user.id
+    const userId = this.context && this.context.user && this.context.user.id
     const found  = await this.tripsStore.findOrCreate({ userId })
     return found && found.length
       ? found.map(l => l.launchId).filter(l => !!l)
@@ -98,5 +98,3 @@ export class UserAPI extends DataSource {
     return !!found
   }
 }
-
-module.exports = UserAPI

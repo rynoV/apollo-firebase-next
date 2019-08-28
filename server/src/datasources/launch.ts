@@ -40,7 +40,7 @@ export class LaunchAPI extends RESTDataSource {
     }
   }
 
-  async getAllLaunches() {
+  async getAllLaunches(): Promise<any[]> {
     const response = await this.get('launches')
     return Array.isArray(response)
       ? response.map(launch => LaunchAPI.launchReducer(launch))
