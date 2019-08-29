@@ -1,23 +1,21 @@
-import styled, { keyframes } from 'react-emotion';
-import { size } from 'polished';
-
-import { ReactComponent as Logo } from '../../../static/logo.svg';
-import { colors } from '../styles';
+import styled, { keyframes } from 'react-emotion'
+import { size } from 'polished'
+import { colors } from '../styles'
 
 const spin = keyframes`
   to {
     transform: rotate(360deg);
   }
-`;
+`
 
-const Loading = styled(Logo)(size(64), {
+const Loading = styled('svg')(size(64), {
   display: 'block',
-  margin: 'auto',
-  fill: colors.grey,
-  path: {
+  margin : 'auto',
+  fill   : colors.grey,
+  path   : {
     transformOrigin: 'center',
-    animation: `${spin} 1s linear infinite`,
+    animation      : `${spin} 1s linear infinite`,
   },
-});
+})
 
-export default Loading;
+export default Loading

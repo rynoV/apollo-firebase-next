@@ -1,8 +1,10 @@
 import React from 'react'
-import fetch from 'isomorphic-unfetch'
 import { NextComponentType, NextPageContext } from 'next'
-import withData from '../lib/withData'
 import Launches from './launches'
+import withData from '../lib/withData'
+import { useQuery } from '@apollo/react-hooks'
+import Login from './login'
+import gql from 'graphql-tag'
 
 interface IProps {
   profile: {
@@ -14,38 +16,15 @@ interface IProps {
   }
 }
 
-const Home: NextComponentType<NextPageContext, any, IProps> = function({
-  profile,
-  ...rest
-}) {
-  if (profile) {
-    return (
-      <Launches />
-    )
-  } else {
-    return null
-  }
+const Home: NextComponentType<NextPageContext, any, IProps> = function() {
+  return <Launches />
 }
 
-Home.getInitialProps = async function({ req }: NextPageContext) {
-  try {
-    const url =
-            req &&
-            req.headers &&
-            req.headers.host &&
-            'http://' + req.headers.host + '/api/main'
+const IS_LOGGED_IN = gql`  query IsUserLoggedIn {    isLoggedIn @client  }`
 
-    if (!url) {
-      return {}
-    }
-
-    const res = await fetch(url)
-
-    return await res.json()
-  } catch (e) {
-    console.log(e)
-    return {}
-  }
+function IsLoggedIn() {
+  const { data } = useQuery(IS_LOGGED_IN)
+  return data.isLoggedIn ? <Home /> : <Login />
 }
 
-export const HomePage = withData(Home)
+export const HomePage = withData(IsLoggedIn)

@@ -1,4 +1,4 @@
-import { ApolloServer } from 'apollo-server'
+import { ApolloServer } from 'apollo-server-micro'
 
 import typeDefs from './schema.graphql'
 import { LaunchAPI } from './datasources/launch'

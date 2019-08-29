@@ -1,0 +1,26 @@
+import React from 'react'
+import styled from 'react-emotion'
+import { useApolloClient } from '@apollo/react-hooks'
+
+import { menuItemClassName } from '../components/menu-item'
+
+export default function LogoutButton() {
+  const client = useApolloClient()
+  return (
+    <StyledButton
+      onClick={() => {
+
+        client.writeData({ data: { isLoggedIn: false } })
+        localStorage.clear()
+      }}
+    >
+      Logout
+    </StyledButton>
+  )
+}
+
+const StyledButton = styled('button')(menuItemClassName, {
+  background: 'none',
+  border    : 'none',
+  padding   : 0,
+})
